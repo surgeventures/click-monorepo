@@ -1,0 +1,29 @@
+version: '3'
+services:
+  db:
+    image: postgres:9.6
+    ports:
+      - "5432:5432"
+  click-api:
+    build:
+      context: ../apps/click-api
+      dockerfile: priv/docker/Dockerfile.dev
+    command: ["mix", "phx.server"]
+    env_file:
+      - ../apps/click-api/priv/docker/dev.env
+    depends_on:
+      - db
+    ports:
+      - "4000:4000"
+  click-client:
+    build:
+      context: ../apps/click-client
+      dockerfile: priv/docker/Dockerfile.dev
+    command: ["mix", "phx.server"]
+    env_file:
+      - ../apps/click-client/priv/docker/dev.env
+    depends_on:
+      - click-api
+    ports:
+      - "4100:4100"
+

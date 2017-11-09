@@ -1,0 +1,9 @@
+version: '3'
+services:
+  click-api:
+    build:
+      context: ../..
+      dockerfile: priv/docker/Dockerfile.test
+    command: ["./priv/docker/start.test.sh"]
+    env_file:
+      - test.env
