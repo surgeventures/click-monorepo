@@ -2,8 +2,6 @@ version: '3'
 services:
   db:
     image: postgres:9.6
-    ports:
-      - "5432:5432"
   click-api:
     build:
       context: ../../apps/click-api
@@ -13,8 +11,6 @@ services:
       - ../../apps/click-api/docker/test-integration/.env
     depends_on:
       - db
-    ports:
-      - "4000:4000"
   click-client:
     build:
       context: ../../apps/click-client
@@ -24,15 +20,13 @@ services:
       - ../../apps/click-client/docker/test-integration/.env
     depends_on:
       - click-api
-    ports:
-      - "4100:4100"
   test:
     build:
-      context: ../../test
+      context: .
       dockerfile: docker/Dockerfile
     command: ["./start.sh"]
     env_file:
-      - ../../test/docker/.env
+      - docker/.env
     depends_on:
       - click-client
 

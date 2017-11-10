@@ -1,8 +1,10 @@
 FROM elixir:1.5.1
 
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
 RUN apt-get update -qq && \
     apt-get install -y \
       netcat \
+      nodejs \
       build-essential \
       vim \
       git \

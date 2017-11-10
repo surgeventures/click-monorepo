@@ -1,9 +1,11 @@
 version: '3'
 services:
+  db:
+    image: postgres:9.6
   click-api:
     build:
-      context: ../..
+      context: .
       dockerfile: docker/test-isolated/Dockerfile
     command: ["./start.sh"]
-    env_file:
-      - .env
+    depends_on:
+      - db
