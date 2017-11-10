@@ -2,14 +2,12 @@ version: '3'
 services:
   db:
     image: postgres:9.6
-    ports:
-      - "5432:5432"
   click-api:
     build:
       context: ../..
-      dockerfile: priv/docker/Dockerfile.test
-    command: ["./priv/docker/start.test.sh"]
+      dockerfile: docker/test-isolated/Dockerfile
+    command: ["./start.sh"]
     env_file:
-      - test.env
+      - .env
     depends_on:
       - db

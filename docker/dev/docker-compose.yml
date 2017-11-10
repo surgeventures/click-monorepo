@@ -1,0 +1,29 @@
+version: '3'
+services:
+  db:
+    image: postgres:9.6
+    ports:
+      - "5432:5432"
+  click-api:
+    build:
+      context: ../../apps/click-api
+      dockerfile: docker/dev/Dockerfile
+    command: ["./start.sh"]
+    env_file:
+      - ../../apps/click-api/docker/dev/.env
+    depends_on:
+      - db
+    ports:
+      - "4000:4000"
+  click-client:
+    build:
+      context: ../../apps/click-client
+      dockerfile: docker/dev/Dockerfile
+    command: ["./start.sh"]
+    env_file:
+      - ../../apps/click-client/docker/dev/.env
+    depends_on:
+      - click-api
+    ports:
+      - "4100:4100"
+

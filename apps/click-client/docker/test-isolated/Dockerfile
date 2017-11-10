@@ -2,6 +2,7 @@ FROM elixir:1.5.1
 
 RUN apt-get update -qq && \
     apt-get install -y \
+      netcat \
       build-essential \
       vim \
       git \
@@ -9,7 +10,7 @@ RUN apt-get update -qq && \
       postgresql-client-9.4
 
 ENV APP_HOME=/usr/src/click-api/
-ENV MIX_ENV=prod
+ENV MIX_ENV=test
 WORKDIR $APP_HOME
 
 COPY mix* $APP_HOME
@@ -18,7 +19,12 @@ RUN mix local.rebar --force
 RUN mix deps.get
 
 COPY config $APP_HOME/config
+COPY docker/test-isolated/test.local.exs $APP_HOME/config/test.local.exs
 RUN mix deps.compile
 
-COPY . $APP_HOME
+COPY lib $APP_HOME/lib
+COPY priv $APP_HOME/priv
+COPY test $APP_HOME/test
 RUN mix compile
+
+COPY docker/test-isolated/start.sh $APP_HOME/start.sh
