@@ -31,7 +31,7 @@ RUN mix compile
 COPY assets/package.json $APP_HOME/assets/package.json
 COPY assets/package-lock.json $APP_HOME/assets/package-lock.json
 WORKDIR $APP_HOME/assets
-RUN npm install --production
+RUN npm install
 
 COPY assets $APP_HOME/assets
 RUN node_modules/brunch/bin/brunch build --production
