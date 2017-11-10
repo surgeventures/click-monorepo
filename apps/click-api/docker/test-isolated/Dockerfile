@@ -12,6 +12,7 @@ RUN apt-get update -qq && \
 ENV APP_HOME=/usr/src/app/
 ENV MIX_ENV=test
 WORKDIR $APP_HOME
+RUN git clone https://github.com/surgeventures/docker-tools.git
 
 COPY mix* $APP_HOME
 RUN mix local.hex --force
@@ -26,5 +27,3 @@ COPY lib $APP_HOME/lib
 COPY priv $APP_HOME/priv
 COPY test $APP_HOME/test
 RUN mix compile
-
-COPY docker/test-isolated/start.sh $APP_HOME/start.sh

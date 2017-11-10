@@ -6,6 +6,11 @@ services:
     build:
       context: .
       dockerfile: docker/test-isolated/Dockerfile
-    command: ["./start.sh"]
+    command: [
+      "./docker-tools/runner.sh",
+      "await", "db", "5432",
+      "run", "2", "mix", "test",
+      "run", "2", "mix", "credo"
+    ]
     depends_on:
       - db
