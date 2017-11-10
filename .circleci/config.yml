@@ -15,7 +15,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: docker-compose --file apps/click-api/docker/test-isolated/docker-compose.yml up --build --abort-on-container-exit
+      - run: docker-compose --file apps/click-client/docker/test-isolated/docker-compose.yml up --build --abort-on-container-exit
   test_integration:
     docker:
       - image: circleci/ruby:2.4.1
