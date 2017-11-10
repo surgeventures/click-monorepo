@@ -1,37 +1,37 @@
 version: 2
 jobs:
-  test_click_api:
+  click_api:
     docker:
       - image: circleci/ruby:2.4.1
       - image: postgres:9.6
     steps:
       - checkout
       - setup_remote_docker
-      - run: docker-compose --file apps/click-api/docker/test-isolated/docker-compose.yml up --build --abort-on-container-exit
-  test_click_client:
+      - run: docker-compose --file apps/click-api/docker-compose.yml up --build --abort-on-container-exit
+  click_client:
     docker:
       - image: circleci/ruby:2.4.1
       - image: postgres:9.6
     steps:
       - checkout
       - setup_remote_docker
-      - run: docker-compose --file apps/click-client/docker/test-isolated/docker-compose.yml up --build --abort-on-container-exit
-  test_integration:
+      - run: docker-compose --file apps/click-client/docker-compose.yml up --build --abort-on-container-exit
+  integration:
     docker:
       - image: circleci/ruby:2.4.1
       - image: postgres:9.6
     steps:
       - checkout
       - setup_remote_docker
-      - run: docker-compose --file docker/test-integration/docker-compose.yml up --build --abort-on-container-exit
+      - run: docker-compose --file tests/integration/docker-compose.yml up --build --abort-on-container-exit
 
 workflows:
   version: 2
-  test_all:
+  all:
     jobs:
-      - test_click_api
-      - test_click_client
-      - test_integration:
+      - click_api
+      - click_client
+      - integration:
           requires:
-            - test_click_api
-            - test_click_client
+            - click_api
+            - click_client
