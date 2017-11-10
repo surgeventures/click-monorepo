@@ -1,0 +1,10 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.4.1
+      - image: postgres:9.6
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker-compose --file apps/click-api/docker/test-isolated/docker-compose.yml up --build --abort-on-container-exit
