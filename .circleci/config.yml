@@ -8,12 +8,12 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-      - run: ls -laR apps/click-api > .circle.run.checksum
+      - run: ls -laR apps/click-api > .circle.run.checksum && cat .circle.run.checksum
       - restore_cache:
          keys:
            - click-api-{{ checksum ".circle.run.checksum" }}-run-v1
       - run: if [ ! -f .circle.run ]; then docker-compose --file apps/click-api/docker-compose.yml up --build --abort-on-container-exit; fi
-      - run: touch .circle.run
+      - run: echo run > .circle.run
       - save_cache:
           key: click-api-{{ checksum ".circle.run.checksum" }}-run-v1
           paths:
@@ -27,12 +27,12 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-      - run: ls -laR apps/click-client > .circle.run.checksum
+      - run: ls -laR apps/click-client > .circle.run.checksum && cat .circle.run.checksum
       - restore_cache:
          keys:
            - click-client-{{ checksum ".circle.run.checksum" }}-run-v1
       - run: if [ ! -f .circle.run ]; then docker-compose --file apps/click-client/docker-compose.yml up --build --abort-on-container-exit; fi
-      - run: touch .circle.run
+      - run: echo run > .circle.run
       - save_cache:
           key: click-client-{{ checksum ".circle.run.checksum" }}-run-v1
           paths:
