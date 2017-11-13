@@ -3,6 +3,6 @@ defmodule ClickClientWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get conn, "/"
-    assert html_response(conn, 200) =~ "124"
+    assert html_response(conn, 200) =~ "123"
   end
 end
