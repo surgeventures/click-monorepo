@@ -3,7 +3,6 @@ jobs:
   click_api:
     docker:
       - image: circleci/ruby:2.4.1
-      - image: postgres:9.6
     steps:
       - checkout
       - setup_remote_docker:
@@ -22,7 +21,6 @@ jobs:
   click_client:
     docker:
       - image: circleci/ruby:2.4.1
-      - image: postgres:9.6
     steps:
       - checkout
       - setup_remote_docker:
