@@ -12,7 +12,7 @@ jobs:
          keys:
            - click-api-{{ checksum ".circle.run.checksum" }}-run-v1
       - run: if [ ! -f .circle.run ]; then docker-compose --file apps/click-api/docker-compose.yml up --build --abort-on-container-exit; fi
-      - run: echo run > .circle.run
+      - run: touch .circle.run
       - save_cache:
           key: click-api-{{ checksum ".circle.run.checksum" }}-run-v1
           paths:
@@ -30,7 +30,7 @@ jobs:
          keys:
            - click-client-{{ checksum ".circle.run.checksum" }}-run-v1
       - run: if [ ! -f .circle.run ]; then docker-compose --file apps/click-client/docker-compose.yml up --build --abort-on-container-exit; fi
-      - run: echo run > .circle.run
+      - run: touch .circle.run
       - save_cache:
           key: click-client-{{ checksum ".circle.run.checksum" }}-run-v1
           paths:
