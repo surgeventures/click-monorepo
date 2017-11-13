@@ -19,7 +19,7 @@ RUN mix local.rebar --force
 RUN mix deps.get
 
 COPY config $APP_HOME/config
-COPY docker/test-isolated/test.local.exs $APP_HOME/config/test.local.exs
+COPY docker/test-unit/test.local.exs $APP_HOME/config/test.local.exs
 RUN mix deps.compile
 
 COPY lib $APP_HOME/lib
@@ -27,4 +27,4 @@ COPY priv $APP_HOME/priv
 COPY test $APP_HOME/test
 RUN mix compile
 
-COPY docker/test-isolated/start.sh $APP_HOME/start.sh
+COPY docker/test-unit/start.sh $APP_HOME/start.sh

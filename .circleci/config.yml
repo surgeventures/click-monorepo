@@ -1,4 +1,5 @@
 version: 2
+
 jobs:
   click-api:
     docker:
@@ -48,12 +49,13 @@ jobs:
 
 workflows:
   version: 2
+
   all:
     jobs:
       - click-api
       - click-client
       - integration:
-          type: approval
           requires:
             - click-api
             - click-client
+

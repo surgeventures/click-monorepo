@@ -5,7 +5,7 @@ services:
   click-api:
     build:
       context: .
-      dockerfile: docker/test-isolated/Dockerfile
+      dockerfile: docker/test-unit/Dockerfile
     command: ["./start.sh"]
     depends_on:
       - db

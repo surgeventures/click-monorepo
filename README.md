@@ -2,18 +2,18 @@
 
 Rebuild & run containers and return exit code:
 
-    docker-compose --file <compose-file> up --build --abort-on-container-exit [<service> ...]
+    docker-compose up --build --abort-on-container-exit [<service> ...]
 
 Rebuild & run containers as daemons:
 
-    docker-compose --file <compose-file> up --daemon [<service> ...]
+    docker-compose up --daemon [<service> ...]
 
 Run one-shot command in specific container:
 
-    docker-compose --file <compose-file> run --rm <service> <command>
+    docker-compose run --rm <service> <command>
 
-Files available for `<compose-file>`:
+There are following context in which you can invoke either of the above:
 
-- `docker/dev/docker-compose.yml` - development setup of entire system
-- `docker/test-integration/docker-compose.yml` - integration test of entire system
-- `apps/<service>/docker/test-isolated/docker-compose.yml` - isolated test for specific service
+- `/` - development setup of entire system
+- `/apps/<service>` - unit test for specific service
+- `/tests/integration` - integration test of entire system
