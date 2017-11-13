@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  click_api:
+  click-api:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
@@ -18,7 +18,7 @@ jobs:
           paths:
             - .circle.run
 
-  click_client:
+  click-client:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
@@ -50,9 +50,9 @@ workflows:
   version: 2
   all:
     jobs:
-      - click_api
-      - click_client
+      - click-api
+      - click-client
       - integration:
           requires:
-            - click_api
-            - click_client
+            - click-api
+            - click-client
