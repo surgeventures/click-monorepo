@@ -6,23 +6,46 @@ jobs:
       - image: postgres:9.6
     steps:
       - checkout
-      - setup_remote_docker
-      - run: docker-compose --file apps/click-api/docker-compose.yml up --build --abort-on-container-exit
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: ls -laR apps/click-api > .circle.run.checksum
+      - restore_cache:
+         keys:
+           - click-api-{{ checksum ".circle.run.checksum" }}-run-v1
+      - run: if [ ! -f .circle.run ]; then docker-compose --file apps/click-api/docker-compose.yml up --build --abort-on-container-exit; fi
+      - run: touch .circle.run
+      - save_cache:
+          key: click-api-{{ checksum ".circle.run.checksum" }}-run-v1
+          paths:
+            - .circle.run
+
   click_client:
     docker:
       - image: circleci/ruby:2.4.1
       - image: postgres:9.6
     steps:
       - checkout
-      - setup_remote_docker
-      - run: docker-compose --file apps/click-client/docker-compose.yml up --build --abort-on-container-exit
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: ls -laR apps/click-client > .circle.run.checksum
+      - restore_cache:
+         keys:
+           - click-client-{{ checksum ".circle.run.checksum" }}-run-v1
+      - run: if [ ! -f .circle.run ]; then docker-compose --file apps/click-client/docker-compose.yml up --build --abort-on-container-exit; fi
+      - run: touch .circle.run
+      - save_cache:
+          key: click-client-{{ checksum ".circle.run.checksum" }}-run-v1
+          paths:
+            - .circle.run
+
   integration:
     docker:
       - image: circleci/ruby:2.4.1
       - image: postgres:9.6
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run: docker-compose --file tests/integration/docker-compose.yml up --build --abort-on-container-exit
 
 workflows:
