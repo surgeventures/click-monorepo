@@ -8,7 +8,7 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-      - run: ls -laR apps/click-api > .circle.run.checksum && cat .circle.run.checksum
+      - run: git ls-files -s apps/click-api > .circle.run.checksum && cat .circle.run.checksum
       - restore_cache:
          keys:
            - click-api-{{ checksum ".circle.run.checksum" }}-run-v1
@@ -27,7 +27,7 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-      - run: ls -laR apps/click-client > .circle.run.checksum && cat .circle.run.checksum
+      - run: git ls-files -s apps/click-client > .circle.run.checksum && cat .circle.run.checksum
       - restore_cache:
          keys:
            - click-client-{{ checksum ".circle.run.checksum" }}-run-v1
