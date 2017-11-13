@@ -11,7 +11,7 @@ defmodule ClickAPIWeb.ClickControllerTest do
         |> get(click_path(conn, :index), %{})
         |> json_response(200)
 
-      assert response == %{"count" => 2}
+      assert response == %{"count" => 2} # v2
     end
   end
 
