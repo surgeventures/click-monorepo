@@ -53,6 +53,7 @@ workflows:
       - click-api
       - click-client
       - integration:
+          type: approval
           requires:
             - click-api
             - click-client
