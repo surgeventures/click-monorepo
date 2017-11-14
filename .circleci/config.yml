@@ -51,10 +51,13 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
+          name: Prepare volumes
+          command: |
+            mkdir -p tests/integration/docker-volumes/chrome-screenshots
+            mkdir -p tests/integration/docker-volumes/chrome-junit-reports
+      - run:
           name: Run integration tests
           command: docker-compose --file tests/integration/docker-compose.yml up --build --abort-on-container-exit test-chrome
-      - run: pwd
-      - run: ls -laR .
       - store_artifacts:
           path: tests/integration/docker-volumes/chrome-screenshots
       - store_test_results:
