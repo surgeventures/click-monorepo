@@ -72,18 +72,19 @@ jobs:
 workflows:
   version: 2
 
-  test-unit:
+  unit:
     jobs:
       - click-api
       - click-client
 
-  test-integration:
-    - approve:
-        type: approval
-    - chrome:
-        requires:
-          - approve
-    - firefox:
-        requires:
-          - approve
+  integration:
+    jobs:
+      - approve:
+          type: approval
+      - chrome:
+          requires:
+            - approve
+      - firefox:
+          requires:
+            - approve
 
