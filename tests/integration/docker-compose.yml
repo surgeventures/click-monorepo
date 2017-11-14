@@ -36,6 +36,10 @@ services:
     environment:
       - WEBDRIVER=chrome_docker
       - SELENIUM_URL=http://selenium-chrome:4444
+    volumes:
+      - ./docker-volumes/chrome-html-reports:/usr/src/app/test/html_reports
+      - ./docker-volumes/chrome-junit-reports:/usr/src/app/test/reports
+      - ./docker-volumes/chrome-screenshots:/usr/src/app/screenshots
 
   test-firefox:
     build:
@@ -50,6 +54,10 @@ services:
     environment:
       - WEBDRIVER=firefox_docker
       - SELENIUM_URL=http://selenium-firefox:4444
+    volumes:
+      - ./docker-volumes/firefox-html-reports:/usr/src/app/test/html_reports
+      - ./docker-volumes/firefox-junit-reports:/usr/src/app/test/reports
+      - ./docker-volumes/firefox-screenshots:/usr/src/app/screenshots
 
   selenium-chrome:
     image: selenium/standalone-chrome:3.6.0
