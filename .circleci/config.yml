@@ -53,10 +53,12 @@ jobs:
       - run:
           name: Run integration tests
           command: docker-compose --file tests/integration/docker-compose.yml up --build --abort-on-container-exit test-chrome
+      - run: pwd
+      - run: ls -laR .
       - store_artifacts:
-          path: /usr/src/app/docker-volumes/chrome-screenshots
+          path: tests/integration/docker-volumes/chrome-screenshots
       - store_test_results:
-          path: /usr/src/app/docker-volumes/chrome-junit-reports
+          path: tests/integration/docker-volumes/chrome-junit-reports
 
   firefox:
     docker:
@@ -68,10 +70,6 @@ jobs:
       - run:
           name: Run integration tests
           command: docker-compose --file tests/integration/docker-compose.yml up --build --abort-on-container-exit test-firefox
-      - store_artifacts:
-          path: /usr/src/app/docker-volumes/firefox-screenshots
-      - store_test_results:
-          path: /usr/src/app/docker-volumes/firefox-junit-reports
 
 workflows:
   version: 2
