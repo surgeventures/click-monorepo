@@ -10,6 +10,7 @@ Dotenv.load
 MiniTest::Reporters.use!
 Minitest::Reporters.use! [
   Minitest::Reporters::HtmlReporter.new,
+  Minitest::Reporters::JUnitReporter.new,
   Minitest::Reporters::SpecReporter.new
 ]
 

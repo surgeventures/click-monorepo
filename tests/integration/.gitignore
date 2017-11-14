@@ -2,5 +2,5 @@
 .env
 .idea/
 test/html_reports
-reports/
+test/reports
 screenshots/
