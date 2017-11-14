@@ -1,0 +1,15 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+group :test do
+  gem "minitest", "~> 5.10", ">= 5.10.2"
+  gem "minitest-reporters", "~> 1.1", ">= 1.1.14"
+  gem "selenium-webdriver", "~> 3.4", ">= 3.4.3"
+end
+
+gem "chunky_png"
+gem "dotenv", "~> 2.2", ">= 2.2.1"
+gem "rake", "~> 12.0"
+gem "require_all", "~> 1.4"
+gem "rubocop", "~> 0.51"

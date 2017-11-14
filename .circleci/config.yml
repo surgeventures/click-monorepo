@@ -37,15 +37,23 @@ jobs:
           paths:
             - .circle.run
 
-  integration:
+  test-chrome:
     docker:
       - image: circleci/ruby:2.4.1
-      - image: postgres:9.6
     steps:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-      - run: docker-compose --file tests/integration/docker-compose.yml up --build --abort-on-container-exit
+      - run: docker-compose --file tests/integration/docker-compose.yml up --build --abort-on-container-exit test-chrome
+
+  test-firefox:
+    docker:
+      - image: circleci/ruby:2.4.1
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: docker-compose --file tests/integration/docker-compose.yml up --build --abort-on-container-exit test-firefox
 
 workflows:
   version: 2
@@ -54,7 +62,11 @@ workflows:
     jobs:
       - click-api
       - click-client
-      - integration:
+      - test-chrome:
+          requires:
+            - click-api
+            - click-client
+      - test-firefox:
           requires:
             - click-api
             - click-client

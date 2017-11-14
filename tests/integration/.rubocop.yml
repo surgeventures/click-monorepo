@@ -1,0 +1,86 @@
+AllCops:
+  DisplayCopNames: true
+  TargetRubyVersion: 2.4
+
+Layout/AlignParameters:
+  EnforcedStyle: with_fixed_indentation
+
+# It's better to align with end keyword than case keyword as aligment to case makes code unreadable
+# when assigning case result to variable. In other uses the result is the same.
+Layout/CaseIndentation:
+  EnforcedStyle: end
+  Enabled: true
+
+# This helps to copy the commands and paste them to a Rails console session, since the prompt will
+# wait for more input after seeing a dot.
+Layout/DotPosition:
+  EnforcedStyle: trailing
+
+# This cuts down on the method invokation length and alignment problems when the method name
+# changes.
+Layout/IndentArray:
+  EnforcedStyle: consistent
+Layout/IndentHash:
+  EnforcedStyle: consistent
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+
+# This will make the lines shorter, so the line length limit can stay low, and the variables can be
+# more descriptive.
+Lint/EndAlignment:
+  EnforcedStyleAlignWith: variable
+
+# Complexity and length metrics need a slight boost for now due to the number of offenses, this can
+# be made more restrictive in the future.
+Metrics/AbcSize:
+  Max: 30
+Metrics/ClassLength:
+  Max: 200
+Metrics/CyclomaticComplexity:
+  Max: 10
+Metrics/LineLength:
+  Max: 100
+Metrics/MethodLength:
+  Max: 20
+
+# In services we may have set_X methods that set some instance variables, also accessors might be
+# overriden with X=(value) methods.
+Naming/AccessorMethodName:
+  Enabled: false
+
+# There's some preference over Hash#has_key? in the team, and without the prefix, the verb is not
+# always obvious.
+Naming/PredicateName:
+  Enabled: false
+
+# Putting braces around parameters depends heavily on context. There was no one-size-fits-all
+# setting for us, so we disabled it.
+Style/BracesAroundHashParameters:
+  Enabled: false
+
+# We strive to have self-documenting code, hence the longer line lengths and alignment settings.
+Style/Documentation:
+  Enabled: false
+
+# It's easy to spot the modifier use of if/unless but only if the line is short enough.
+Style/IfUnlessModifier:
+  MaxLineLength: 30
+
+# It's better to have consistent comparisons, could as well define Object#greater_than_2_and_a_half?
+Style/NumericPredicate:
+  Enabled: false
+
+# Sometimes the block params might be actually more descriptive if the author can choose their
+# names.
+Style/SingleLineBlockParams:
+  Enabled: false
+
+# There are no performance benefits of using single-quote, and if interpolation is needed, it won't
+# be necessary to change quotes around the string.
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+# Although %w() arrays are easier to add items to, they're worse when one needs to split them into
+# mutliple lines - regular arrays look much better in that case.
+Style/WordArray:
+  Enabled: false

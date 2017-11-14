@@ -1,0 +1,6 @@
+.DS_Store
+.env
+.idea/
+test/html_reports
+reports/
+screenshots/

@@ -2,6 +2,7 @@ version: '3'
 services:
   db:
     image: postgres:9.6
+
   click-api:
     build:
       context: ../../apps/click-api
@@ -11,6 +12,7 @@ services:
       - ../../apps/click-api/docker/test-integration/.env
     depends_on:
       - db
+
   click-client:
     build:
       context: ../../apps/click-client
@@ -20,7 +22,8 @@ services:
       - ../../apps/click-client/docker/test-integration/.env
     depends_on:
       - click-api
-  test:
+
+  test-chrome:
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -29,4 +32,34 @@ services:
       - docker/.env
     depends_on:
       - click-client
+      - selenium-chrome
+    environment:
+      - WEBDRIVER=chrome_docker
+      - SELENIUM_URL=http://selenium-chrome:4444
+
+  test-firefox:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: ["./start.sh"]
+    env_file:
+      - docker/.env
+    depends_on:
+      - click-client
+      - selenium-firefox
+    environment:
+      - WEBDRIVER=firefox_docker
+      - SELENIUM_URL=http://selenium-firefox:4444
+
+  selenium-chrome:
+    image: selenium/standalone-chrome:3.6.0
+    shm_size: 2G
+    volumes:
+      - /dev/shm:/dev/shm
+
+  selenium-firefox:
+    image: selenium/standalone-firefox:3.6.0
+    shm_size: 2G
+    volumes:
+      - /dev/shm:/dev/shm
 
