@@ -14,6 +14,7 @@ class HomePageTest < Minitest::Test
 
   def test_can_open_via_url
     @home_page.open_via_url
+    @home_page.save_screenshot(:open_via_url)
 
     assert_match(
       /The most sophisticated click counter ever/,
@@ -34,14 +35,24 @@ class HomePageTest < Minitest::Test
 
   def test_can_add_clicks
     @home_page.open_via_url
+    @home_page.save_screenshot(:add_clicks_before)
     prev_click_count = @home_page.button_click_count.text
     @home_page.click_button_click_count
-    sleep 0.5
+    Browser.wait_for { @home_page.button_click_count.text.to_i == prev_click_count.to_i + 1 }
+    @home_page.save_screenshot(:add_clicks_after)
 
     assert_equal(
       prev_click_count.to_i + 1,
       @home_page.button_click_count.text.to_i,
       "Click count was not incremented"
+    )
+
+    Browser.refresh(@home_page.driver)
+
+    assert_equal(
+      prev_click_count.to_i + 1,
+      @home_page.button_click_count.text.to_i,
+      "Click count was not persisted after refresh"
     )
   end
 end

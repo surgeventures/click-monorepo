@@ -4,7 +4,7 @@ class HomePage < BasePage
   include Elements
   include Actions
 
-  PATH = "#{ENV['CLICK_CLIENT_URL']}/"
+  PATH = "#{ENV.fetch('CLICK_CLIENT_URL')}/"
 
   def open_via_url
     driver.navigate.to PATH

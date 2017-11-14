@@ -45,6 +45,9 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run: docker-compose --file tests/integration/docker-compose.yml up --build --abort-on-container-exit test-chrome
+      - store_artifacts:
+          path: /usr/src/app/screenshots
+          path: /usr/src/app/test/html_reports
 
   test-firefox:
     docker:
@@ -54,6 +57,9 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run: docker-compose --file tests/integration/docker-compose.yml up --build --abort-on-container-exit test-firefox
+      - store_artifacts:
+          path: /usr/src/app/screenshots
+          path: /usr/src/app/test/html_reports
 
 workflows:
   version: 2
@@ -62,12 +68,15 @@ workflows:
     jobs:
       - click-api
       - click-client
+      - test:
+          type: approval
+          requires:
+            - click-api
+            - click-client
       - test-chrome:
           requires:
-            - click-api
-            - click-client
+            - test
       - test-firefox:
           requires:
-            - click-api
-            - click-client
+            - test
 
