@@ -9,80 +9,11 @@ Features:
 - organizes Docker configuration for multiple contexts, such as development or tests
 - includes an optimized configuration for running integration on CircleCI
 
-## Structure overview
-
-```sh
-apps
-  app1                    # (1)
-    docker                # (2)
-      dev                 # (3)
-      ...
-    docker-compose.yml
-  ...
-tests
-  e2e                     # (4)
-    docker                # (5)
-    docker-compose.yml
-  ...
-docker-compose.yml
-```
-
-Description:
-
-1. Each application is placed in the `/apps` directory.
-
-2. Each application holds all its Docker setup in `docker` subdirectory, with a convenience-driven
-   exception for `docker-compose.yml` which resides in application root.
-
-3. Each application splits its Docker setup into subdirectories within `docker` for each required
-   Docker context, such as `dev e2e test`.
-
-4. Each test suite, starting with end-to-end tests in `e2e` and optionally followed by others such
-   as performance tests, is placed in `/tests` directory.
-
-5. Each test suite holds all its Docker setup in `docker` subdirectory, with a convenience- driven
-   exception for `docker-compose.yml` which resides in test suite root.
-
-6. Each [Docker context](#docker-contexts) has its `docker-compose.yml` placed in a
-
-### Reasoning
-
-#### Organizing applications
-
-It's hard to define a clear semantic separation of applications (such as `frontend` and `backend`)
-because of such responsibilities often being shared and mixed (such as a SPA front-end application
-having a backend component for SSR or backend applications being a mix of completely internal
-background processors vs JSON APIs vs HTML renderers). Therefore, the `apps` directory was
-introduced to keep the applications in one place, but without further nesting.
-
-#### Organizing per-application Docker setup
-
-Docker setup for specific application is usually similar across contexts, therefore holding it
-within application directory - even when it's really used by a context from outside the application
-directory as is the case with `dev` or `e2e` - makes up for easiest possible creation and
-maintenance of all Docker setups for specific application.
-
-#### Organizing Docker contexts
-
-Each Docker context requires a considerable amount of similarly named files (such as `Dockerfile`).
-Therefore the setup for each of them was put into a separate subdirectory in order to keep things
-clean and uncluttered.
-
-#### Organizing Compose files
-
-It's convenient to place `docker-compose.yml` for each context in the most logical place in the
-repository structure (and in case of applications outside of the `docker` subdirectory) in order to
-allow an easy and intuitive usage of the `docker-compose` command (along with its possible aliases)
-without the `--file` parameter.
-
-#### Organizing test suites
-
-Each test suite represents a test unit that requires a dedicated Docker context - and it should have
-one filled for all applications required by the suite's Compose file.
-
 ## Docker contexts
 
-The following naming was established for distinct Docker contexts.
+This repository contains multiple so-called Docker contexts, each with its dedicated Compose file or
+set of Compose files, allowing to manage the system or its part against a specific use case.
+Sections below describe each Docker context in detail.
 
 ### `dev`
 
@@ -136,6 +67,97 @@ In addition, the command above will output the following content:
 - `/tmp/<chrome|firefox>-screenshots` - screenshots
 - `/tmp/<chrome|firefox>-html-reports` - HTML reports
 - `/tmp/<chrome|firefox>-junit-reports` - JUnit reports
+
+## Directory structure
+
+```sh
+.circleci
+  config.yml              # (1)
+apps
+  app1                    # (2)
+    docker                # (3)
+      dev                 # (4)
+      ...
+    docker-compose.yml    # (5)
+  ...
+tests
+  e2e                     # (6)
+    docker                # (7)
+    docker-compose.yml    # (5)
+  ...
+docker-compose.yml        # (5)
+```
+
+Legend:
+
+1. CircleCI config is placed in the `/.circleci` directory.
+
+2. Each application is placed in the `/apps` directory.
+
+3. Each application holds all its Docker setup (except for Compose file) in `docker` subdirectory.
+
+4. Each application splits its Docker setup into subdirectories within `docker` for each required
+   [Docker context](#docker-contexts).
+
+5. Each Docker context has its Compose file placed in the place chosen as most logical and
+   convenient for it in the repository structure ([more info](#docker-contexts)).
+
+6. Each test suite, starting with end-to-end tests in `e2e` and optionally followed by others such
+   as performance tests, is placed in `/tests` directory.
+
+7. Each test suite holds all its Docker setup in `docker` subdirectory.
+
+### Reasoning
+
+Here's a more thorough explanation of each of the decisions behind the directory structure.
+
+#### Applications
+
+It's hard to define a clear semantic separation of applications (such as `frontend` and `backend`)
+because of such responsibilities often being shared and mixed (such as a SPA front-end application
+having a backend component for SSR or backend applications being a mix of completely internal
+background processors vs JSON APIs vs HTML renderers).
+
+Therefore, the `apps` directory was introduced to keep the applications in one place separate from
+tests or integration config, but no further nesting was applied.
+
+#### Per-application Docker setup
+
+Docker setup for specific application is usually similar across contexts, therefore holding it
+within application directory - even when it's really used by a context from outside the application
+directory as is the case with `dev` or `e2e` - makes up for easiest possible creation and
+maintenance of all Docker setups for specific application.
+
+Holding Docker setup inside application directory and nested within `docker` subdirectory ensures:
+
+- these files don't pollute the application root
+- they appear next to each other in diffs
+- the project outside `docker` stays separated from and unaware of the Docker layer
+- we can use the application directory as context for `Dockerfile` and `COPY` commands
+
+> It's worth noting as a counter-point that modifications to Docker contexts other than `test` will
+  unnecessarily bust per-app CircleCI build caches ([more info](#circleci-configuration)). It's not
+  considered a big deal due to expected infrequent changes there and the fact that those changes
+  will usually touch the `test` context as well.
+
+#### Docker contexts
+
+Each Docker context requires a considerable amount of similarly named files (such as `Dockerfile`).
+Therefore the setup for each of them was put into a separate subdirectory in order to keep things
+clean and uncluttered.
+
+#### Compose files
+
+It's convenient to place `docker-compose.yml` for each context in the most logical place in the
+repository structure (and in case of applications outside of the `docker` subdirectory) in order to
+allow an easy and intuitive usage of the `docker-compose` command (along with convenient aliases)
+without the `--file` parameter.
+
+#### Test suites
+
+Each test suite represents a test unit that requires a dedicated Docker context. This means that an
+appropriate Docker context inside `apps/<app>/docker/<context>` should be filled for all
+applications required by the suite's Compose file.
 
 ## CircleCI configuration
 
