@@ -43,13 +43,41 @@ jobs:
           paths:
             - .circle.run
 
-  chrome:
+  integration-build:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
+      - run:
+          name: Build apps
+          command: |
+            docker-compose --file tests/integration/docker-compose.yml build click-api click-client
+      - run:
+          name: Save images
+          command: |
+            docker save integration_click-api > /tmp/images/click-api.tar
+            docker save integration_click-client > /tmp/images/click-client.tar
+      - persist_to_workspace:
+          root: /tmp/images
+          paths:
+            - "*.tar"
+
+  integration-chrome:
+    docker:
+      - image: circleci/ruby:2.4.1
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - attach_workspace:
+          at: /tmp/images
+      - run:
+          name: Load images
+          command: |
+            docker load --input /tmp/images/click-api.tar
+            docker load --input /tmp/images/click-client.tar
       - run:
           name: Run integration tests
           command: |
@@ -66,13 +94,20 @@ jobs:
       - store_test_results:
           path: /tmp/reports
 
-  firefox:
+  integration-firefox:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
+      - attach_workspace:
+          at: /tmp/images
+      - run:
+          name: Load images
+          command: |
+            docker load --input /tmp/images/click-api.tar
+            docker load --input /tmp/images/click-client.tar
       - run:
           name: Run integration tests
           command: |
@@ -96,12 +131,11 @@ workflows:
     jobs:
       - click-api
       - click-client
-      - hold-integration:
-          type: approval
-      - chrome:
+      - integration-build
+      - integration-chrome:
           requires:
-            - hold-integration
-      - firefox:
+            - integration-build
+      - integration-firefox:
           requires:
-            - hold-integration
+            - integration-build
 
