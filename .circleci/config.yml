@@ -50,6 +50,7 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
+      - run: ls -laR .
       - run:
           name: Prebuild shared images
           command: |
