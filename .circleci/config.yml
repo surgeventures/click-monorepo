@@ -75,24 +75,33 @@ jobs:
           docker_layer_caching: true
       - run:
           name: Run integration tests
-          command: docker-compose --file tests/integration/docker-compose.yml up --build --abort-on-container-exit test-firefox
+          command: |
+            docker-compose --file tests/integration/docker-compose.yml build test-firefox
+            docker-compose --file tests/integration/docker-compose.yml run --name app test-firefox ./start.sh
+      - run:
+          name: Copy test output
+          when: always
+          command: |
+            docker cp app:/usr/src/app/test/reports /tmp
+            docker cp app:/usr/src/app/screenshots /tmp
+      - store_artifacts:
+          path: /tmp/screenshots
+      - store_test_results:
+          path: /tmp/reports
 
 workflows:
   version: 2
 
-  unit:
+  ci:
     jobs:
       - click-api
       - click-client
-
-  integration:
-    jobs:
-      - approve:
+      - hold-integration:
           type: approval
       - chrome:
           requires:
-            - approve
+            - hold-integration
       - firefox:
           requires:
-            - approve
+            - hold-integration
 
