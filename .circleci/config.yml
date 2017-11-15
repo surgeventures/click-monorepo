@@ -115,11 +115,11 @@ workflows:
     jobs:
       - click-api
       - click-client
-      - integration-build
+      - integration-prebuild
       - integration-chrome:
           requires:
-            - integration-build
+            - integration-prebuild
       - integration-firefox:
           requires:
-            - integration-build
+            - integration-prebuild
 
