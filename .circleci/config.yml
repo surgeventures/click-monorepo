@@ -85,13 +85,6 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-      - attach_workspace:
-          at: /tmp/images
-      - run:
-          name: Load images
-          command: |
-            docker load --input /tmp/images/click-api.tar
-            docker load --input /tmp/images/click-client.tar
       - run:
           name: Run integration tests
           command: |
