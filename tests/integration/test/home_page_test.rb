@@ -17,7 +17,7 @@ class HomePageTest < Minitest::Test
     @home_page.save_screenshot(:open_via_url)
 
     assert_match(
-      /The most sophisticated click counter ever/,
+      /The most sophisticated click counter ever bad/,
       @home_page.p_lead.text,
       "Home page did not open via URL"
     )
