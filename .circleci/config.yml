@@ -53,7 +53,7 @@ jobs:
       - run:
           name: Prebuild shared images
           command: |
-            docker-compose --file tests/integration/docker-compose.yml build click-api click-client
+            docker-compose --file tests/e2e/docker-compose.yml build click-api click-client
 
   integration-chrome:
     docker:
@@ -65,8 +65,8 @@ jobs:
       - run:
           name: Run integration tests
           command: |
-            docker-compose --file tests/integration/docker-compose.yml build test-chrome
-            docker-compose --file tests/integration/docker-compose.yml run --name app test-chrome ./start.sh
+            docker-compose --file tests/e2e/docker-compose.yml build test-chrome
+            docker-compose --file tests/e2e/docker-compose.yml run --name app test-chrome ./start.sh
       - run:
           name: Copy test output
           when: always
@@ -88,8 +88,8 @@ jobs:
       - run:
           name: Run integration tests
           command: |
-            docker-compose --file tests/integration/docker-compose.yml build test-firefox
-            docker-compose --file tests/integration/docker-compose.yml run --name app test-firefox ./start.sh
+            docker-compose --file tests/e2e/docker-compose.yml build test-firefox
+            docker-compose --file tests/e2e/docker-compose.yml run --name app test-firefox ./start.sh
       - run:
           name: Copy test output
           when: always

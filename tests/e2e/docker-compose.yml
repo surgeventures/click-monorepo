@@ -6,24 +6,24 @@ services:
   click-api:
     build:
       context: ../../apps/click-api
-      dockerfile: docker/test-integration/Dockerfile
+      dockerfile: docker/e2e/Dockerfile
     command: ["./start.sh"]
     env_file:
-      - ../../apps/click-api/docker/test-integration/.env
+      - ../../apps/click-api/docker/e2e/.env
     depends_on:
       - db
 
   click-client:
     build:
       context: ../../apps/click-client
-      dockerfile: docker/test-integration/Dockerfile
+      dockerfile: docker/e2e/Dockerfile
     command: ["./start.sh"]
     env_file:
-      - ../../apps/click-client/docker/test-integration/.env
+      - ../../apps/click-client/docker/e2e/.env
     depends_on:
       - click-api
 
-  test-chrome:
+  chrome:
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -41,7 +41,7 @@ services:
       - /tmp/chrome-junit-reports:/usr/src/app/test/reports
       - /tmp/chrome-screenshots:/usr/src/app/screenshots
 
-  test-firefox:
+  firefox:
     build:
       context: .
       dockerfile: docker/Dockerfile
