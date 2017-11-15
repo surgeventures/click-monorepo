@@ -55,6 +55,10 @@ jobs:
           command: |
             docker-compose --file tests/integration/docker-compose.yml build test-chrome
             docker-compose --file tests/integration/docker-compose.yml run --name app test-chrome ./start.sh
+      - run:
+          name: Copy test output
+          when: always
+          command: |
             docker cp app:/usr/src/app/test/reports /tmp
             docker cp app:/usr/src/app/screenshots /tmp
       - store_artifacts:
