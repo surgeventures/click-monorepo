@@ -52,11 +52,15 @@ jobs:
           docker_layer_caching: true
       - run:
           name: Run integration tests
-          command: docker-compose --file tests/integration/docker-compose.yml up --build --abort-on-container-exit test-chrome
+          command: |
+            docker-compose --file tests/integration/docker-compose.yml build test-chrome
+            docker-compose --file tests/integration/docker-compose.yml run --name app test-chrome ./start.sh
+            docker cp app:/usr/src/app/test/reports /tmp
+            docker cp app:/usr/src/app/screenshots /tmp
       - store_artifacts:
-          path: /tmp/chrome-screenshots
+          path: /tmp/screenshots
       - store_test_results:
-          path: /tmp/chrome-junit-reports
+          path: /tmp/reports
 
   firefox:
     docker:
