@@ -43,7 +43,7 @@ jobs:
           paths:
             - .circle.run
 
-  integration-build:
+  integration-prebuild:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
@@ -51,18 +51,9 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
-          name: Build apps
+          name: Prebuild shared images
           command: |
             docker-compose --file tests/integration/docker-compose.yml build click-api click-client
-      - run:
-          name: Save images
-          command: |
-            docker save integration_click-api > /tmp/images/click-api.tar
-            docker save integration_click-client > /tmp/images/click-client.tar
-      - persist_to_workspace:
-          root: /tmp/images
-          paths:
-            - "*.tar"
 
   integration-chrome:
     docker:
@@ -71,13 +62,6 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-      - attach_workspace:
-          at: /tmp/images
-      - run:
-          name: Load images
-          command: |
-            docker load --input /tmp/images/click-api.tar
-            docker load --input /tmp/images/click-client.tar
       - run:
           name: Run integration tests
           command: |
