@@ -43,7 +43,7 @@ jobs:
           paths:
             - .circle.run
 
-  integration-prebuild:
+  e2e-prebuild:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
@@ -55,7 +55,7 @@ jobs:
           command: |
             docker-compose --file tests/e2e/docker-compose.yml build click-api click-client
 
-  integration-chrome:
+  e2e-chrome:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
@@ -65,8 +65,8 @@ jobs:
       - run:
           name: Run integration tests
           command: |
-            docker-compose --file tests/e2e/docker-compose.yml build test-chrome
-            docker-compose --file tests/e2e/docker-compose.yml run --name app test-chrome ./start.sh
+            docker-compose --file tests/e2e/docker-compose.yml build chrome
+            docker-compose --file tests/e2e/docker-compose.yml run --name app chrome ./start.sh
       - run:
           name: Copy test output
           when: always
@@ -78,7 +78,7 @@ jobs:
       - store_test_results:
           path: /tmp/reports
 
-  integration-firefox:
+  e2e-firefox:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
@@ -88,8 +88,8 @@ jobs:
       - run:
           name: Run integration tests
           command: |
-            docker-compose --file tests/e2e/docker-compose.yml build test-firefox
-            docker-compose --file tests/e2e/docker-compose.yml run --name app test-firefox ./start.sh
+            docker-compose --file tests/e2e/docker-compose.yml build firefox
+            docker-compose --file tests/e2e/docker-compose.yml run --name app firefox ./start.sh
       - run:
           name: Copy test output
           when: always
@@ -108,11 +108,11 @@ workflows:
     jobs:
       - click-api
       - click-client
-      - integration-prebuild
-      - integration-chrome:
+      - e2e-prebuild
+      - e2e-chrome:
           requires:
-            - integration-prebuild
-      - integration-firefox:
+            - e2e-prebuild
+      - e2e-firefox:
           requires:
-            - integration-prebuild
+            - e2e-prebuild
 
