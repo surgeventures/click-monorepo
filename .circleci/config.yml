@@ -15,7 +15,7 @@ jobs:
          keys:
            - click-api-{{ checksum ".circle.run.checksum" }}-run-v1
       - run:
-          name: Run unit tests
+          name: Run tests
           command: if [ ! -f .circle.run ]; then docker-compose --file apps/click-api/docker-compose.yml up --build --abort-on-container-exit && touch .circle.run; fi
       - save_cache:
           key: click-api-{{ checksum ".circle.run.checksum" }}-run-v1
@@ -36,7 +36,7 @@ jobs:
          keys:
            - click-client-{{ checksum ".circle.run.checksum" }}-run-v1
       - run:
-          name: Run unit tests
+          name: Run tests
           command: if [ ! -f .circle.run ]; then docker-compose --file apps/click-client/docker-compose.yml up --build --abort-on-container-exit && touch .circle.run; fi
       - save_cache:
           key: click-client-{{ checksum ".circle.run.checksum" }}-run-v1
@@ -63,7 +63,7 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
-          name: Run integration tests
+          name: Run tests
           command: |
             docker-compose --file tests/e2e/docker-compose.yml build chrome
             docker-compose --file tests/e2e/docker-compose.yml run --name app chrome ./start.sh
@@ -86,7 +86,7 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
-          name: Run integration tests
+          name: Run tests
           command: |
             docker-compose --file tests/e2e/docker-compose.yml build firefox
             docker-compose --file tests/e2e/docker-compose.yml run --name app firefox ./start.sh
