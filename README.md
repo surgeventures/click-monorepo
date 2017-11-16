@@ -1,13 +1,15 @@
 # click-monorepo
 
-Sample integrated system with multiple microservices, organized as monorepo.
-
 Features:
 
-- uses the monorepo pattern in order to reduce the complexity of system-wide code management
+- embraces the monorepo pattern in order to reduce the complexity of code management
+- includes multiple sample applications that make for a working microservice system
+- includes end-to-end test suite that uses Selenium with multiple web drivers
+- uses Docker for setting up and running development, tests and production in a consistent way
+- uses CircleCI for running isolated and end-to-end tests in the cloud
 - organizes microservice applications and cross-service tests
 - organizes Docker setup for multiple apps and contexts, such as development or test
-- includes an optimized configuration for running integration on CircleCI
+- includes an optimized configuration for running efficient integration on CircleCI
 
 ## Docker contexts
 
@@ -193,3 +195,19 @@ CircleCI setup has the following traits:
   debugging and integration with CircleCI test insights facilities
 - `docker cp` is used to take the build artifacts out of the Remote Docker environment back into
   the primary container, from which the CircleCI can upload them further
+
+## Possible improvements
+
+The current setup already solves many technical issues related to monorepo, CI and Docker. Still, a
+number of improvements and additions is possible, including:
+
+- sample client/server JS application with `jest` and `eslint` checks
+- sample Ruby on Rails application with `rake test` and `rubocop` checks
+- sample Cordova application on top of JS application
+- `mix test` integration with CircleCI test results
+- `rake test` integration with CircleCI test results
+- `jest` integration with CircleCI test results
+- test suite for performance/scalability testing
+- setup for Cordova mobile app build and testing
+- setup for end-to-end testing on non-Dockerized browsers
+- continuous review-app/production deployment with CircleCI & Docker
