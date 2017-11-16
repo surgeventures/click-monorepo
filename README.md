@@ -1,66 +1,68 @@
 # click-monorepo
 
-Sample integrated system with multiple micro-services, organized as mono-repo.
+Sample integrated system with multiple microservices, organized as monorepo.
 
 Features:
 
 - uses the monorepo pattern in order to reduce the complexity of system-wide code management
 - organizes microservice applications and cross-service tests
-- organizes Docker configuration for multiple contexts, such as development or tests
+- organizes Docker setup for multiple apps and contexts, such as development or test
 - includes an optimized configuration for running integration on CircleCI
 
 ## Docker contexts
 
-This repository contains multiple so-called Docker contexts, each with its dedicated Compose file or
-set of Compose files, allowing to manage the system or its part against a specific use case.
-Sections below describe each Docker context in detail.
+We use a term "Docker contexts" to describe a single Compose file or a set of Compose files that
+allow to manage the system or its part in a specific use case. Sections below describe each Docker
+context in detail.
 
 ### `dev`
 
 Represents the development setup of the entire system and each service within it. It may be started
 in a variety of ways, depending on required services and intended terminal behavior.
 
-In usual case, you'll want to start everything except for the service that is being developed. That
-can be done with the following set of commands:
+In usual case, you'll want to start everything except for the service that is being developed (in
+order to interact with it directly and efficiently). Run the following commands from the monorepo
+root:
 
     docker-compose up --daemon
     docker-compose stop <service-in-development>
 
-You may drop the last command in order to have an entire system in development setup.
+You may drop the last command in order to have and be able to interact with (eg. for debugging
+purposes) an entire system in development environment.
 
 You may want to run a one-shot command against specific service (such as running seeds or
-migrations). Here's how:
+migrations). Run the following command:
 
     docker-compose run --rm <service> <command>
 
-You may also want to preview logs for running services in order to debug issues in them. Here's how:
+You may also want to preview logs for running services in order to debug issues in them. Run the
+following command:
 
     docker-compose logs --follow
 
 ### `test`
 
-Represents isolated (sometimes referred to as component tests in the microservice community) tests
-of a specific service.
+Represents isolated tests (sometimes called "component tests" in the microservice community) of a
+specific application. These tests may require external dependencies for testing purposes, such as a
+database or a service mock, but they never depend on other applications.
 
-In usual case, you'll want to test the service that is being developed without involving Docker in
-order to have the shortest feedback loop possible. Running them via Docker Compose ensures that
-external dependencies required by component tests (such as test database) are also set up.
+In usual case, you'll want to test the application that is being developed without involving Docker
+in order to have the shortest feedback loop possible.
 
-They can be run (most likely but not necessarily on a CI) with a single command invoked from the
-`apps/<app>` directory:
+In order to execute them and receive a build & test exit status, run the following command from the
+`/apps/<app>` directory:
 
     docker-compose up --build --abort-on-container-exit
 
 ### `e2e`
 
-Represents end-to-end tests of the entire system, run against multiple Selenium drivers (`chrome`
-and `firefox` in the current setup).
+Represents cross-application end-to-end tests of the entire system, run against multiple Selenium
+drivers, such as `chrome` and `firefox`.
 
-They can be run with a single command invoked from the `tests/e2e` directory:
+In order to execute them and receive a build & test exit status, run the following command from the
+`tests/e2e` directory:
 
     docker-compose up --build --abort-on-container-exit <chrome|firefox>
-
-The command above will return with exit status `0` if build and test run is successful.
 
 In addition, the command above will output the following content:
 
@@ -77,20 +79,20 @@ apps
   app1                    # (2)
     docker                # (3)
       dev                 # (4)
-      ...
+      ...contexts
     docker-compose.yml    # (5)
-  ...
+  ...apps
 tests
   e2e                     # (6)
     docker                # (7)
     docker-compose.yml    # (5)
-  ...
+  ...test-suites
 docker-compose.yml        # (5)
 ```
 
 Legend:
 
-1. CircleCI config is placed in the `/.circleci` directory.
+1. CircleCI config is placed in the `/.circleci` directory (enforced by the service).
 
 2. Each application is placed in the `/apps` directory.
 
@@ -99,11 +101,11 @@ Legend:
 4. Each application splits its Docker setup into subdirectories within `docker` for each required
    [Docker context](#docker-contexts).
 
-5. Each Docker context has its Compose file placed in the place chosen as most logical and
-   convenient for it in the repository structure ([more info](#docker-contexts)).
+5. Each Docker context has its Compose file placed in the most convenient location in the
+   repository.
 
-6. Each test suite, starting with end-to-end tests in `e2e` and optionally followed by others such
-   as performance tests, is placed in `/tests` directory.
+6. Each test suite, starting with end-to-end tests in `e2e` (later `perf` and more), is placed in
+   `/tests` directory.
 
 7. Each test suite holds all its Docker setup in `docker` subdirectory.
 
@@ -112,6 +114,10 @@ Legend:
 Here's a more thorough explanation of each of the decisions behind the directory structure.
 
 #### Applications
+
+Although this repo only contains a handful of sample applications, microservice systems often have
+dozens of them. Therefore, they should be kept separate from integrated tests and other global
+content.
 
 It's hard to define a clear semantic separation of applications (such as `frontend` and `backend`)
 because of such responsibilities often being shared and mixed (such as a SPA front-end application
@@ -123,22 +129,24 @@ tests or integration config, but no further nesting was applied.
 
 #### Per-application Docker setup
 
+Depending on the application, there may be a lot of files required for a complete Docker setup.
+Assuming that Docker setup is just a tooling/deployment choice made and built on top of the actual
+application code, it makes sense to keep it separate without mixing it with the rest of the
+application.
+
 Docker setup for specific application is usually similar across contexts, therefore holding it
 within application directory - even when it's really used by a context from outside the application
-directory as is the case with `dev` or `e2e` - makes up for easiest possible creation and
-maintenance of all Docker setups for specific application.
+directory as is the case with `dev` or `e2e` - makes up for the easiest possible creation and
+maintenance of Docker setup for all Docker contexts required by specific application.
 
-Holding Docker setup inside application directory and nested within `docker` subdirectory ensures:
+Holding Docker setup inside application directory and nested within `docker` subdirectory has the
+following advantages:
 
-- these files don't pollute the application root
-- they appear next to each other in diffs
-- the project outside `docker` stays separated from and unaware of the Docker layer
-- we can use the application directory as context for `Dockerfile` and `COPY` commands
-
-> It's worth noting as a counter-point that modifications to Docker contexts other than `test` will
-  unnecessarily bust per-app CircleCI build caches ([more info](#circleci-configuration)). It's not
-  considered a big deal due to expected infrequent changes there and the fact that those changes
-  will usually touch the `test` context as well.
+- Docker setup doesn't pollute the application structure
+- project outside `docker` stays separated from and unaware of the Docker layer
+- changes in specific application's Docker setup is grouped together in diffs
+- application root can be used as context for `Dockerfile` and `COPY` commands
+- addition of new Docker-ready applications is a matter of copy-pasting existing `docker` directory
 
 #### Docker contexts
 
@@ -148,10 +156,10 @@ clean and uncluttered.
 
 #### Compose files
 
-It's convenient to place `docker-compose.yml` for each context in the most logical place in the
-repository structure (and in case of applications outside of the `docker` subdirectory) in order to
-allow an easy and intuitive usage of the `docker-compose` command (along with convenient aliases)
-without the `--file` parameter.
+It's convenient to place the Compose file with a default name `docker-compose.yml` for each context
+in the most logical, natural and intuitive place in the repository structure (and in case of
+applications outside of the `docker` subdirectory) in order to allow an easy and intuitive usage of
+the `docker-compose` command (along with convenient aliases) without the `--file` parameter.
 
 #### Test suites
 
@@ -159,27 +167,29 @@ Each test suite represents a test unit that requires a dedicated Docker context.
 appropriate Docker context inside `apps/<app>/docker/<context>` should be filled for all
 applications required by the suite's Compose file.
 
+If multiple test suites can share a single Docker context, then they should be organized under a
+single sub-directory within `/tests/<test-suite`. This makes for less Docker image builds and
+an utilization of Docker build cache to the fullest.
+
 ## CircleCI configuration
 
-There's a working monorepo config provided in the `.circleci` directory. Here's what it does:
+There's a working monorepo config provided in the `.circleci` directory. It provides a `ci`
+workflow, which executes the following actions in parallel:
 
-1. Runs the `test` context for each application (in parallel).
-2. Prebuilds the `e2e` context.
-3. Runs the `e2e` context for each Selenium driver (in parallel).
-
-In case of a failure during any of the above steps, the subsequent steps are not executed.
+- runs the `test` context for each application (each app in parallel)
+- prebuilds and runs the `e2e` context for each Selenium driver (each driver in parallel)
 
 CircleCI setup has the following traits:
 
-- Remote Docker is used in order to build everything using Compose files instead of duplicating
-  their setup directly in the `.circleci/config.yml`
+- Remote Docker is used in order to consistently build everything using Compose files instead of
+  duplicating their setup directly in the `.circleci/config.yml`
 - Docker layer caching is enabled in order to ensure that unchanged parts of Docker builds are not
-  built again after they were already built before
+  built again after they were already built before (enabled per CircleCI customer request)
 - Dependency caching is used in order to avoid re-running isolated tests that were already
-  succesfully run before against the same version of specific application
+  succesfully run before against the same checksum of specific application
 - `e2e-prebuild` job is executed before per-driver end-to-end tests in order to ensure that Docker
   layer caching is fully utilized by parallel per-driver jobs
-- Artifacts and test results are stored in order to persist them for build debugging and integration
-  with CircleCI test insights facilities
+- artifacts and test results from the `e2e` test suite are stored in order to persist them for build
+  debugging and integration with CircleCI test insights facilities
 - `docker cp` is used to take the build artifacts out of the Remote Docker environment back into
   the primary container, from which the CircleCI can upload them further
