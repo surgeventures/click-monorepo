@@ -2,10 +2,17 @@ version: '3'
 services:
   db:
     image: postgres:9.6
+
   click-api:
+    depends_on:
+      - db
     build:
       context: .
       dockerfile: docker/test/Dockerfile
-    command: ["./start.sh"]
-    depends_on:
-      - db
+    command:
+      - docker-tools/runner.rb
+      - |
+        - wait_for_port: db:5432
+        - all:
+          - run: mix test
+          - run: mix credo

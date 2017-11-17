@@ -2,16 +2,14 @@ FROM elixir:1.5.1
 
 RUN apt-get update -qq && \
     apt-get install -y \
-      netcat \
       build-essential \
-      vim \
-      git \
-      libpq-dev \
-      postgresql-client-9.4
+      ruby
 
 ENV APP_HOME=/usr/src/app/
 ENV MIX_ENV=prod
 WORKDIR $APP_HOME
+
+RUN git clone --branch v0.3 https://github.com/surgeventures/docker-tools.git
 
 COPY mix* $APP_HOME
 RUN mix local.hex --force
@@ -26,5 +24,4 @@ COPY lib $APP_HOME/lib
 COPY priv $APP_HOME/priv
 RUN mix compile
 
-COPY docker/e2e/start.sh $APP_HOME/start.sh
 EXPOSE 4000

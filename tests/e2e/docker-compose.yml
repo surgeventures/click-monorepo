@@ -4,60 +4,81 @@ services:
     image: postgres:9.6
 
   click-api:
+    depends_on:
+      - db
     build:
       context: ../../apps/click-api
       dockerfile: docker/e2e/Dockerfile
-    command: ["./start.sh"]
-    env_file:
-      - ../../apps/click-api/docker/e2e/.env
-    depends_on:
-      - db
+    environment:
+      DATABASE_URL: postgres://postgres@db:5432/click_api_integration
+      HOST: localhost
+      PORT: 4000
+      SECRET_KEY_BASE: x5/wIDQMSO9+bvroF82peQJGX6XmTcYkmpY6t/1IQYAdNaLNGmGmJcdso+AIx1Xe
+    command:
+      - docker-tools/runner.rb
+      - |
+        - wait_for_port: db:5432
+        - run: mix ecto.setup
+        - run: mix phx.server
 
   click-client:
+    depends_on:
+      - click-api
     build:
       context: ../../apps/click-client
       dockerfile: docker/e2e/Dockerfile
-    command: ["./start.sh"]
-    env_file:
-      - ../../apps/click-client/docker/e2e/.env
-    depends_on:
-      - click-api
+    environment:
+      API_URL: http://click-api:4000
+      HOST: localhost
+      PORT: 4100
+      SECRET_KEY_BASE: noBYg/nBqZBStJg4hvhZ5vM3sQ5dEr+FZN+TMbpeujUHgTHLRJwM4Y5NEGC3PKxl
+    command:
+      - docker-tools/runner.rb
+      - |
+        - wait_for_port: click-api:4000
+        - run: mix phx.server
 
   chrome:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    command: ["./start.sh"]
-    env_file:
-      - docker/.env
     depends_on:
       - click-client
       - selenium-chrome
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
     environment:
-      - WEBDRIVER=chrome_docker
-      - SELENIUM_URL=http://selenium-chrome:4444
+      CLICK_CLIENT_URL: http://click-client:4100
+      SELENIUM_URL: http://selenium-chrome:4444
+      WEBDRIVER: chrome_docker
     volumes:
       - /tmp/chrome-html-reports:/usr/src/app/test/html_reports
       - /tmp/chrome-junit-reports:/usr/src/app/test/reports
       - /tmp/chrome-screenshots:/usr/src/app/screenshots
+    command:
+      - docker-tools/runner.rb
+      - |
+        - wait_for_port: click-client:4100
+        - run: bundle exec rake test
 
   firefox:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    command: ["./start.sh"]
-    env_file:
-      - docker/.env
     depends_on:
       - click-client
       - selenium-firefox
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
     environment:
-      - WEBDRIVER=firefox_docker
-      - SELENIUM_URL=http://selenium-firefox:4444
+      CLICK_CLIENT_URL: http://click-client:4100
+      SELENIUM_URL: http://selenium-firefox:4444
+      WEBDRIVER: firefox_docker
     volumes:
       - /tmp/firefox-html-reports:/usr/src/app/test/html_reports
       - /tmp/firefox-junit-reports:/usr/src/app/test/reports
       - /tmp/firefox-screenshots:/usr/src/app/screenshots
+    command:
+      - docker-tools/runner.rb
+      - |
+        - wait_for_port: click-client:4100
+        - run: bundle exec rake test
 
   selenium-chrome:
     image: selenium/standalone-chrome:3.6.0

@@ -4,21 +4,31 @@ services:
     image: postgres:9.6
     ports:
       - "5432:5432"
+
   click-api:
+    depends_on:
+      - db
     build:
       context: apps/click-api
       dockerfile: docker/dev/Dockerfile
-    command: ["./start.sh"]
-    depends_on:
-      - db
     ports:
       - "4000:4000"
+    command:
+      - docker-tools/runner.rb
+      - |
+        - wait_for_port: db:5432
+        - run: mix phx.server
+
   click-client:
+    depends_on:
+      - click-api
     build:
       context: apps/click-client
       dockerfile: docker/dev/Dockerfile
-    command: ["./start.sh"]
-    depends_on:
-      - click-api
     ports:
       - "4100:4100"
+    command:
+      - docker-tools/runner.rb
+      - |
+        - wait_for_port: click-api:4000
+        - run: mix phx.server

@@ -173,6 +173,26 @@ If multiple test suites can share a single Docker context, then they should be o
 single sub-directory within `/tests/<test-suite`. This makes for less Docker image builds and
 an utilization of Docker build cache to the fullest.
 
+## Docker setup
+
+Following decisions were made when writing Docker setup:
+
+- language-specific image is picked as base image for each application and test suite
+
+- `COPY` command selectively targets only the content really required for specific step
+
+- runner script from [docker-tools](https://github.com/surgeventures/docker-tools) is used for
+  waiting for ports and executing multiple commands on behalf of single service in Compose file
+
+- global non-secret environment variables are entered directly in Compose files
+
+- secret environment variables are entered in `.env.example` and copied by hand to gitignored `.env`
+  which is required by Compose files
+
+- the number of Compose files is reduced to a minimum in cases like end-to-end tests which are run
+  against multiple Selenium drivers by putting all services into one Compose file and requiring to
+  specify specific service on `docker-compose up` (as described [here](#e2e))
+
 ## CircleCI configuration
 
 There's a working monorepo config provided in the `.circleci` directory. It provides a `ci`
@@ -201,6 +221,7 @@ CircleCI setup has the following traits:
 The current setup already solves many technical issues related to monorepo, CI and Docker. Still, a
 number of improvements and additions is possible, including:
 
+- scripting around development setup with deps and secrets
 - sample client/server JS application with `jest` and `eslint` checks
 - sample Ruby on Rails application with `rake test` and `rubocop` checks
 - sample Cordova application on top of JS application
@@ -211,3 +232,4 @@ number of improvements and additions is possible, including:
 - setup for Cordova mobile app build and testing
 - setup for end-to-end testing on non-Dockerized browsers
 - continuous review-app/production deployment with CircleCI & Docker
+- in-repo secret encryption with AES

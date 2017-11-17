@@ -1,7 +1,12 @@
 version: '3'
 services:
-  click-api:
+  click-client:
     build:
       context: .
       dockerfile: docker/test/Dockerfile
-    command: ["./start.sh"]
+    command:
+      - docker-tools/runner.rb
+      - |
+        - all:
+          - run: mix test
+          - run: mix credo

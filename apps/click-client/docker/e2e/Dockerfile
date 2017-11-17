@@ -3,17 +3,15 @@ FROM elixir:1.5.1
 RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
 RUN apt-get update -qq && \
     apt-get install -y \
-      netcat \
-      nodejs \
       build-essential \
-      vim \
-      git \
-      libpq-dev \
-      postgresql-client-9.4
+      nodejs \
+      ruby
 
 ENV APP_HOME=/usr/src/app/
 ENV MIX_ENV=prod
 WORKDIR $APP_HOME
+
+RUN git clone --branch v0.3 https://github.com/surgeventures/docker-tools.git
 
 COPY mix* $APP_HOME
 RUN mix local.hex --force
@@ -39,4 +37,4 @@ RUN node_modules/brunch/bin/brunch build --production
 WORKDIR $APP_HOME
 RUN mix phx.digest
 
-COPY docker/e2e/start.sh $APP_HOME/start.sh
+EXPOSE 4100
