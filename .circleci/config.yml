@@ -15,7 +15,7 @@ jobs:
          keys:
            - click-api-{{ checksum ".circle.run.checksum" }}-run-v1
       - run:
-          name: Run unit tests
+          name: Run tests
           command: if [ ! -f .circle.run ]; then docker-compose --file apps/click-api/docker-compose.yml up --build --abort-on-container-exit && touch .circle.run; fi
       - save_cache:
           key: click-api-{{ checksum ".circle.run.checksum" }}-run-v1
@@ -36,14 +36,14 @@ jobs:
          keys:
            - click-client-{{ checksum ".circle.run.checksum" }}-run-v1
       - run:
-          name: Run unit tests
+          name: Run tests
           command: if [ ! -f .circle.run ]; then docker-compose --file apps/click-client/docker-compose.yml up --build --abort-on-container-exit && touch .circle.run; fi
       - save_cache:
           key: click-client-{{ checksum ".circle.run.checksum" }}-run-v1
           paths:
             - .circle.run
 
-  chrome:
+  e2e-prebuild:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
@@ -51,10 +51,22 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
-          name: Run integration tests
+          name: Prebuild shared images
           command: |
-            docker-compose --file tests/integration/docker-compose.yml build test-chrome
-            docker-compose --file tests/integration/docker-compose.yml run --name app test-chrome ./start.sh
+            docker-compose --file tests/e2e/docker-compose.yml build click-api click-client
+
+  e2e-chrome:
+    docker:
+      - image: circleci/ruby:2.4.1
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Run tests
+          command: |
+            docker-compose --file tests/e2e/docker-compose.yml build chrome
+            docker-compose --file tests/e2e/docker-compose.yml run --name app chrome ./start.sh
       - run:
           name: Copy test output
           when: always
@@ -66,7 +78,7 @@ jobs:
       - store_test_results:
           path: /tmp/reports
 
-  firefox:
+  e2e-firefox:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
@@ -74,10 +86,10 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
-          name: Run integration tests
+          name: Run tests
           command: |
-            docker-compose --file tests/integration/docker-compose.yml build test-firefox
-            docker-compose --file tests/integration/docker-compose.yml run --name app test-firefox ./start.sh
+            docker-compose --file tests/e2e/docker-compose.yml build firefox
+            docker-compose --file tests/e2e/docker-compose.yml run --name app firefox ./start.sh
       - run:
           name: Copy test output
           when: always
@@ -96,12 +108,11 @@ workflows:
     jobs:
       - click-api
       - click-client
-      - hold-integration:
-          type: approval
-      - chrome:
+      - e2e-prebuild
+      - e2e-chrome:
           requires:
-            - hold-integration
-      - firefox:
+            - e2e-prebuild
+      - e2e-firefox:
           requires:
-            - hold-integration
+            - e2e-prebuild
 

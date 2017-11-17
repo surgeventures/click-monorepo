@@ -9,22 +9,22 @@ RUN apt-get update -qq && \
       libpq-dev \
       postgresql-client-9.4
 
-ENV APP_HOME=/usr/src/click-api/
-ENV MIX_ENV=test
+ENV APP_HOME=/usr/src/app/
+ENV MIX_ENV=prod
 WORKDIR $APP_HOME
 
 COPY mix* $APP_HOME
 RUN mix local.hex --force
 RUN mix local.rebar --force
-RUN mix deps.get
+RUN mix deps.get --only prod
 
 COPY config $APP_HOME/config
-COPY docker/test-unit/test.local.exs $APP_HOME/config/test.local.exs
+COPY docker/e2e/prod.exs $APP_HOME/config/prod.exs
 RUN mix deps.compile
 
 COPY lib $APP_HOME/lib
 COPY priv $APP_HOME/priv
-COPY test $APP_HOME/test
 RUN mix compile
 
-COPY docker/test-unit/start.sh $APP_HOME/start.sh
+COPY docker/e2e/start.sh $APP_HOME/start.sh
+EXPOSE 4000

@@ -1,5 +1,5 @@
 .DS_Store
-.env
+/.env
 .idea/
 test/html_reports
 test/reports
